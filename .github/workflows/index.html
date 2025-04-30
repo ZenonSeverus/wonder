@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>ระบบคำนวณราคา Wonderfood</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin: 20px;
+    }
+    .container {
+      border: 1px solid #ccc;
+      padding: 20px;
+      display: inline-block;
+      border-radius: 10px;
+      width: 500px;
+    }
+    .item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 10px 0;
+    }
+    .item span {
+      flex: 2;
+      text-align: left;
+    }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    input[type=range] {
+      width: 100px;
+    }
+    .btn {
+      padding: 5px 10px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .plus { background-color: #2f855a; color: white; }
+    .minus { background-color: #e53e3e; color: white; }
+    .reset { background-color: #3182ce; color: white; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+
+  <h2>คำนวณราคา Wonderfood</h2>
+  <div class="container">
+    <button class="btn reset" onclick="resetAll()">เปิดบิลใหม่</button>
+
+    <div id="product-list"></div>
+
+    <h3 id="total">ราคารวม: 0 แกลเลี่ยน</h3>
+  </div>
+
+  <script>
+    const products = [
+      { name: "Caramel Harmony", price: 800 },
+      { name: "Cream Note ", price: 800 },
+      { name: "Sea Sound", price: 1200 },
+      { name: "Mushroom Tune", price: 1400 },
+      { name: "Stew Rhythm", price: 1800 },
+      { name: "Salmon Melodic", price: 2200 },
+      { name: "Pasta Symphony", price: 2400 }
+    ];
+
+    const productList = document.getElementById('product-list');
+    let total = 0;
+
+    function updateTotal() {
+      total = 0;
+      products.forEach((p, i) => {
+        const qty = parseInt(document.getElementById(`qty-${i}`).textContent);
+        total += qty * p.price;
+      });
+      document.getElementById("total").textContent = `ราคารวม: ${total} แกลเลี่ยน`;
+    }
+
+    function changeQty(index, delta) {
+      const qtyElem = document.getElementById(`qty-${index}`);
+      let qty = parseInt(qtyElem.textContent);
+      qty = Math.max(0, qty + delta);
+      qtyElem.textContent = qty;
+      document.getElementById(`range-${index}`).value = qty;
+      updateTotal();
+    }
+
+    function changeBySlider(index, value) {
+      document.getElementById(`qty-${index}`).textContent = value;
+      updateTotal();
+    }
+
+    function resetAll() {
+      products.forEach((p, i) => {
+        document.getElementById(`qty-${i}`).textContent = 0;
+        document.getElementById(`range-${i}`).value = 0;
+        document.getElementById(`chk-${i}`).checked = false;
+      });
+      updateTotal();
+    }
+
+    products.forEach((p, i) => {
+      const div = document.createElement('div');
+      div.className = "item";
+      div.innerHTML = `
+        <span>${p.name}<br>(${p.price} แกลเลี่ยน/ชิ้น):</span>
+        <div id="qty-${i}">0</div>
+        <div class="controls">
+          <button class="btn minus" onclick="changeQty(${i}, -1)">-</button>
+          <input type="range" id="range-${i}" min="0" max="10" value="0" oninput="changeBySlider(${i}, this.value)">
+          <button class="btn plus" onclick="changeQty(${i}, 1)">+</button>
+        </div>
+        <input type="checkbox" id="chk-${i}"> ส่งมอบ
+      `;
+      productList.appendChild(div);
+    });
+
+    updateTotal();
+  </script>
+
+</body>
+</html>
